@@ -1,0 +1,29 @@
+services:
+  reverse-proxy:
+    image: nginx:alpine
+    container_name: nginx-reverse-proxy
+    volumes:
+    - D:/myApp/my-app.conf:/etc/nginx/nginx.conf
+    ports:
+    - 80:80               
+                                                                       
+      
+  netflix-app:
+     image: mrtompkin/netflix-demo
+     container_name: netflix-demo
+     ports:
+       - 90:80
+
+  csv-app:
+     image: mrtompkin/postman-example-to-csv
+     container_name: postman-example-to-csv
+     ports:
+       - 70:80
+
+  web:
+    image: sirimakg/my-flask:v2
+    container_name: testweb
+    ports:
+      - 60:80
+
+ # /etc/nginx/nginx.conf
