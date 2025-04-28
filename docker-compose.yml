@@ -3,7 +3,7 @@ services:
     image: nginx:alpine
     container_name: nginx-reverse-proxy
     volumes:
-    - D:/myApp/my-app.conf:/etc/nginx/nginx.conf
+    - /D/myApp/my-app.conf:/etc/nginx/nginx.conf
     ports:
     - 80:80               
                                                                        
@@ -25,5 +25,9 @@ services:
     container_name: testweb
     ports:
       - 60:80
+
+volumes:
+  my-app-conf:
+    driver: local
 
  # /etc/nginx/nginx.conf
