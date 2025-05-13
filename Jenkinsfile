@@ -15,12 +15,14 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-            steps {
-                script {
-                    docker.build("${IMAGE_NAME}:${IMAGE_TAG}")
-                }
-            }
+    steps {
+        script {
+            sh """
+            docker build --no-cache -t $IMAGE_NAME:$IMAGE_TAG .
+            """
         }
+    }
+}
 
         stage('Push to Docker Hub') {
             steps {
