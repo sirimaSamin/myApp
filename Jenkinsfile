@@ -39,7 +39,11 @@ pipeline {
             steps {
                 script {
                     sh """
+ main
                     docker-compose up 
+
+                  
+ Develop
                     """
                 }
             }
