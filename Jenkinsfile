@@ -15,22 +15,21 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-            steps {
-                script {
-                    sh """
-                    docker build -t $IMAGE_NAME:$IMAGE_TAG .
-                    """
-                }
-            }
+    steps {
+        script {
+            sh """
+            docker build --no-cache -t $IMAGE_NAME:$IMAGE_TAG .
+            """
         }
+    }
+}
 
         stage('Push to Docker Hub') {
             steps {
                 script {
                     docker.withRegistry('', DOCKERHUB_CREDENTIALS) {
-                        sh """
-                        docker push $IMAGE_NAME:$IMAGE_TAG
-                        """
+                        def image = docker.image("${IMAGE_NAME}:${IMAGE_TAG}")
+                        image.push()
                     }
                 }
             }
@@ -40,7 +39,6 @@ pipeline {
             steps {
                 script {
                     sh """
-                    docker-compose down
                     docker-compose up -d
                     """
                 }
