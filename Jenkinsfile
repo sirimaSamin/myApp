@@ -28,7 +28,7 @@ pipeline {
             steps{
                 // สแกนหาcritical
                 def trivyExitCode = sh(
-                    script : "docker run --rm -v /var/run/dovker.sock:/var/run/docker.sock aqusec/trivy image --exit-code 1
+                    script : "docker run --rm -v /var/run/dovker.sock:/var/run/docker.sock aquasec/trivy image --exit-code 1
                     --severity CRITICAL ${IMAGE_NAME}:${IMAGE_TAG}",
                     returnStatus: true
                 )
