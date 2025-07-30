@@ -15,14 +15,42 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-    steps {
-        script {
-            sh """
-            docker build --no-cache -t $IMAGE_NAME:$IMAGE_TAG .
-            """
+           steps {
+              script {
+                  sh """
+                  docker build --no-cache -t $IMAGE_NAME:$IMAGE_TAG .
+                  """
         }
     }
 }
+
+        stage('Security scan')
+            steps{
+                // สแกนหาcritical
+                def trivyExitCode = sh(
+                    script : "docker run --rm -v /var/run/dovker.sock:/var/run/docker.sock aqusec/trivy image --exit-code 1
+                    --severity CRITICAL ${IMAGE_NAME}:${IMAGE_TAG}",
+                    returnStatus: true
+                )
+
+                // if critical found  stop pipeline
+                if (trivyExitCode == 1 ){
+                    error("Critical vulnerability found, process stopped")
+                }
+
+
+                //สแกนและเซฟรายงานเป็นHTML
+                sh"""
+                docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+                -v ${WORKSPACE}:/report aquasec/trivy image --severity CRITICAL \
+                --format template --template "@contrib/html.tpl" \ -o /report/trivy-report.html ${IMAGE_NAME}:${IMAGE_TAG}
+                """
+            }
+
+
+
+
+
 
         stage('Push to Docker Hub') {
             steps {
@@ -39,6 +67,7 @@ pipeline {
             steps {
                 script {
                     sh """
+                    docker-compose down
                     docker-compose up -d
 
                     """
