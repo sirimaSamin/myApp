@@ -24,6 +24,7 @@ pipeline {
     }
 }
 
+<<<<<<< HEAD
         stage('Security scan')
             steps{
                 // สแกนหาcritical
@@ -51,6 +52,8 @@ pipeline {
 
 
 
+=======
+>>>>>>> 28bb2c8 (delete scan security)
 
         stage('Push to Docker Hub') {
             steps {
