@@ -1,5 +1,5 @@
 # ใช้ base image ที่รองรับ Python
-FROM python:3.8-slim
+FROM python:3.9-slim
 
 # ตั้ง working directory ภายใน container
 WORKDIR /app
