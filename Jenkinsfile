@@ -25,7 +25,7 @@ pipeline {
 }
         stage('Trivy Scan'){
             steps{
-                sh "Trivy --severity CRITICAL --no-progress image --format table -o trivy-scan-report.txt sirimakg/jenkins-test:v2 "
+                sh "trivy --severity CRITICAL --no-progress image --format table -o trivy-scan-report.txt  $IMAGE_NAME:$IMAGE_TAG "
             }
         }
 
