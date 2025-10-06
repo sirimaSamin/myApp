@@ -25,7 +25,11 @@ pipeline {
 }
         stage('Trivy Scan'){
             steps{
-                sh "trivy --severity CRITICAL --no-progress image --format table -o trivy-scan-report.txt  $IMAGE_NAME:$IMAGE_TAG "
+                sh "trivy --severity CRITICAL \
+                --ignore-unfixed \
+                --exit-code 1 \
+                 --no-progress image --format table \
+                 -o trivy-scan-report.txt  $IMAGE_NAME:$IMAGE_TAG "
             }
         }
 
