@@ -28,7 +28,7 @@ pipeline {
                 sh "trivy --severity CRITICAL \
                 --ignore-unfixed \
                 --exit-code 1 \
-                 --no-progress --format table \
+                 --no-progress image --format table \
                  -o trivy-scan-report.txt \
                   $IMAGE_NAME:$IMAGE_TAG "
             }
