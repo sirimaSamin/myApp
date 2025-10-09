@@ -39,8 +39,8 @@ pipeline {
             }
             
             // เซฟรายงานเป็น HTML (จะทำงานเสมอไม่ว่าจะพบ vulnerability หรือไม่)
-            sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v ${WORKSPACE}:/report aquasec/trivy image --severity CRITICAL \ 
-                       --format template --template \"@/contrib/html.tpl\" -o /report/trivy-report.html ${IMAGE_NAME}:${IMAGE_TAG}"
+            sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v ${WORKSPACE}:/report aquasec/trivy image --severity CRITICAL 
+                 --format template --template \"@/contrib/html.tpl\" -o /report/trivy-report.html ${IMAGE_NAME}:${IMAGE_TAG}"
         }
     }
 }
