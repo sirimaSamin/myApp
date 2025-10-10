@@ -31,12 +31,7 @@ pipeline {
                       script: "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image \
                        --exit-code 1 --severity CRITICAL ${IMAGE_NAME}:${IMAGE_TAG}",
                       returnStatus: true
-            )
-
-            // ถ้าเจอ Critical ให้หยุด Pipeline
-                  if (trivyExitCode == 1) {
-                      error("พบ CRITICAL! หยุดกระบวนการ")
-            }
+            )           
             
             // เซฟรายงานเป็น HTML (จะทำงานเสมอไม่ว่าจะพบ vulnerability หรือไม่)
                   sh """
@@ -47,6 +42,11 @@ pipeline {
         }
     }
 }
+            // ถ้าเจอ Critical ให้หยุด Pipeline
+                  if (trivyExitCode == 1) {
+                      error("พบ CRITICAL! หยุดกระบวนการ")
+            }
+
         stage('Push to Docker Hub') {
             steps {
                 script {
