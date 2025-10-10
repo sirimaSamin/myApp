@@ -39,13 +39,14 @@ pipeline {
                      -v ${WORKSPACE}:/report aquasec/trivy image --severity CRITICAL \\ 
                      --format table -o /var/jenkins_home/workspace/test-pipeline/trivy-scan-report.txt ${IMAGE_NAME}:${IMAGE_TAG}
                   """
-        }
-    }
-}
-            // ถ้าเจอ Critical ให้หยุด Pipeline
+                  // ถ้าเจอ Critical ให้หยุด Pipeline
                   if (trivyExitCode == 1) {
                       error("พบ CRITICAL! หยุดกระบวนการ")
             }
+        }
+    }
+}
+            
 
         stage('Push to Docker Hub') {
             steps {
