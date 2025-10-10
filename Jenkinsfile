@@ -24,30 +24,29 @@ pipeline {
     }
 }
         stage('Security Scan Trivy') {
-    steps {
-        script {
+           steps {
+              script {
             // สแกนและตรวจสอบ Critical Vulnerabilities
-            def trivyExitCode = sh(
-                script: "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image \
-                        --exit-code 1 --severity CRITICAL ${IMAGE_NAME}:${IMAGE_TAG}",
-                returnStatus: true
+                  def trivyExitCode = sh(
+                      script: "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image \
+                       --exit-code 1 --severity CRITICAL ${IMAGE_NAME}:${IMAGE_TAG}",
+                      returnStatus: true
             )
 
             // ถ้าเจอ Critical ให้หยุด Pipeline
-            if (trivyExitCode == 1) {
-                error("พบ CRITICAL! หยุดกระบวนการ")
+                  if (trivyExitCode == 1) {
+                      error("พบ CRITICAL! หยุดกระบวนการ")
             }
             
             // เซฟรายงานเป็น HTML (จะทำงานเสมอไม่ว่าจะพบ vulnerability หรือไม่)
-            sh "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v ${WORKSPACE}:/report aquasec/trivy image --severity CRITICAL 
-                 --format template --template \"@/contrib/html.tpl\" -o /report/trivy-report.html ${IMAGE_NAME}:${IMAGE_TAG}"
+                  sh """
+                     docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \\
+                     -v ${WORKSPACE}:/report aquasec/trivy image --severity CRITICAL \\ 
+                     --format template --template \"@/contrib/html.tpl\" -o /report/trivy-report.html ${IMAGE_NAME}:${IMAGE_TAG}
+                  """
         }
     }
 }
-
-
-
-
         stage('Push to Docker Hub') {
             steps {
                 script {
@@ -65,7 +64,6 @@ pipeline {
                     sh """
                     docker-compose down
                     docker-compose up -d
-
                     """
                 }
             }
