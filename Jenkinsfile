@@ -42,7 +42,7 @@ pipeline {
                   sh """
                      docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \\
                      -v ${WORKSPACE}:/report aquasec/trivy image --severity CRITICAL \\ 
-                     --format template --template \"@/contrib/html.tpl\" -o trivy-scan-report.txt ${IMAGE_NAME}:${IMAGE_TAG}
+                     --format template --template \"@/contrib/html.tpl\" -o /var/jenkins_home/workspace/test-pipeline/trivy-scan-report.txt ${IMAGE_NAME}:${IMAGE_TAG}
                   """
         }
     }
