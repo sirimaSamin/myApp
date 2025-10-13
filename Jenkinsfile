@@ -30,6 +30,7 @@ pipeline {
                   def trivyExitCode = sh(
                       script: "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image \
                        --exit-code 1 --severity CRITICAL ${IMAGE_NAME}:${IMAGE_TAG}",
+
                       returnStatus: true
             )           
             
@@ -39,9 +40,10 @@ pipeline {
                      -v /var/run/docker.sock:/var/run/docker.sock \\
                      -v ${WORKSPACE}:/report\\
                      aquasec/trivy image \\
+                     --no-progress image\\
                      --severity CRITICAL \\ 
                      --format table \\
-                     -o /report//test-pipeline/trivy-scan-report.txt \\ 
+                     -o trivy-scan-report.txt \\ 
                      ${IMAGE_NAME}:${IMAGE_TAG}
                   """
                   // ถ้าเจอ Critical ให้หยุด Pipeline
