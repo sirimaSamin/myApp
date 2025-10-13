@@ -35,9 +35,14 @@ pipeline {
             
             // เซฟรายงานเป็น HTML (จะทำงานเสมอไม่ว่าจะพบ vulnerability หรือไม่)
                   sh """
-                     docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \\
-                     -v ${WORKSPACE}:/report aquasec/trivy image --severity CRITICAL \\ 
-                     --format table -o /var/jenkins_home/workspace/test-pipeline/trivy-scan-report.txt ${IMAGE_NAME}:${IMAGE_TAG}
+                     docker run --rm \\
+                     -v /var/run/docker.sock:/var/run/docker.sock \\
+                     -v ${WORKSPACE}:/report\\
+                     aquasec/trivy image \\
+                     --severity CRITICAL \\ 
+                     --format table \\
+                     -o /report//test-pipeline/trivy-scan-report.txt \\ 
+                     ${IMAGE_NAME}:${IMAGE_TAG}
                   """
                   // ถ้าเจอ Critical ให้หยุด Pipeline
                   if (trivyExitCode == 1) {
