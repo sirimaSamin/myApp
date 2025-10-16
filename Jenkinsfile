@@ -40,10 +40,10 @@ pipeline {
                      -v /var/run/docker.sock:/var/run/docker.sock \\
                      -v ${WORKSPACE}:/report\\
                      aquasec/trivy image \\
-                     --no-progress image\\
+                     --no-progress \\
                      --severity CRITICAL \\ 
                      --format table \\
-                     -o trivy-scan-report.txt \\ 
+                     -o /report/trivy-scan-report.txt \\ 
                      ${IMAGE_NAME}:${IMAGE_TAG}
                   """
                   // ถ้าเจอ Critical ให้หยุด Pipeline
@@ -53,6 +53,14 @@ pipeline {
         }
     }
 }
+        post {
+        always {
+            // Archive report เสมอ
+            archiveArtifacts artifacts: 'trivy-scan-report.txt', fingerprint: false
+        }
+    }
+}
+
             
 
         stage('Push to Docker Hub') {
