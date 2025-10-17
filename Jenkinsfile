@@ -38,12 +38,13 @@ pipeline {
                   sh """
                      docker run --rm \\
                      -v /var/run/docker.sock:/var/run/docker.sock \\
-                     -v ${WORKSPACE}:/report\\
+                    -v /reports:/report \\
                      aquasec/trivy image \\
                      --no-progress \\
                      --severity CRITICAL \\ 
-                     --format table \\
-                     -o /report/trivy-scan-report.txt \\ 
+                     --format template \\
+                     --template \"@/contrib/html.tpl\" \\
+                     -o /report/trivy-scan-report.html \\ 
                      ${IMAGE_NAME}:${IMAGE_TAG}
                   """
                   // ถ้าเจอ Critical ให้หยุด Pipeline
@@ -52,15 +53,29 @@ pipeline {
             }
         }
     }
-}
-        post {
-        always {
-            // Archive report เสมอ
-            archiveArtifacts artifacts: 'trivy-scan-report.txt', fingerprint: false
-        }
-    }
-}
 
+           post {
+             always {
+            // เนื่องจากไฟล์อยู่ภายนอก Jenkins workspace
+            // อาจต้องใช้วิธีอื่นในการ archive
+                 sh """
+                    # คัดลอกไฟล์จาก /reports มาไว้ใน workspace เพื่อ archive
+                    cp /reports/trivy-scan-report.html ./
+                 """
+                 archiveArtifacts artifacts: 'trivy-scan-report.html', fingerprint: false
+
+                  // เพิ่ม publishHTML เพื่อดู report ใน Jenkins UI
+                    publishHTML([
+                        allowMissing: false,
+                        alwaysLinkToLastBuild: true,
+                        keepAll: true,
+                        reportDir: '',
+                        reportFiles: 'trivy-scan-report.html',
+                        reportName: 'Trivy Security Report'
+                    ])
+                }
+            }
+         }    
             
 
         stage('Push to Docker Hub') {
