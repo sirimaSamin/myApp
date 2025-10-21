@@ -30,10 +30,11 @@ pipeline {
                   def trivyExitCode = sh(
                       script: "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image \
                        --no-progress --exit-code 1 --severity CRITICAL ${IMAGE_NAME}:${IMAGE_TAG}",
-
                       returnStatus: true
             )           
-            
+                  //  สร้าง directory /reports ใน Jenkins container
+                   sh "mkdir -p /reports"
+
             // เซฟรายงานเป็น HTML (จะทำงานเสมอไม่ว่าจะพบ vulnerability หรือไม่)
                   sh """
                      docker run --rm \\
@@ -41,11 +42,11 @@ pipeline {
                     -v /reports:/report \\
                      aquasec/trivy image \\
                      --no-progress \\
-                     --severity CRITICAL ${IMAGE_NAME}:${IMAGE_TAG}\\ 
+                     --severity CRITICAL \\ 
                      --format template \\
                      --template \"@/contrib/html.tpl\" \\
                      -o /reports/trivy-scan-report.html \\ 
-                     
+                     ${IMAGE_NAME}:${IMAGE_TAG}
                   """
                   // ถ้าเจอ Critical ให้หยุด Pipeline
                   if (trivyExitCode == 1) {
