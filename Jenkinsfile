@@ -32,20 +32,18 @@ pipeline {
                        --no-progress --exit-code 1 --severity CRITICAL ${IMAGE_NAME}:${IMAGE_TAG}",
                       returnStatus: true
             )           
-                  //  สร้าง directory /reports ใน Jenkins container
-                   sh "mkdir -p /reports"
 
             // เซฟรายงานเป็น HTML (จะทำงานเสมอไม่ว่าจะพบ vulnerability หรือไม่)
                   sh """
                      docker run --rm \\
                      -v /var/run/docker.sock:/var/run/docker.sock \\
-                    -v /reports:/report \\
+                     -v $(pwd):/report \\
                      aquasec/trivy image \\
                      --no-progress \\
                      --severity CRITICAL \\ 
                      --format template \\
                      --template \"@/contrib/html.tpl\" \\
-                     -o /reports/trivy-scan-report.html \\ 
+                     -o /report/trivy-scan-report.html \\ 
                      ${IMAGE_NAME}:${IMAGE_TAG}
                   """
                   // ถ้าเจอ Critical ให้หยุด Pipeline
@@ -57,12 +55,6 @@ pipeline {
 
            post {
              always {
-            // เนื่องจากไฟล์อยู่ภายนอก Jenkins workspace
-            // อาจต้องใช้วิธีอื่นในการ archive
-                 sh """
-                    # คัดลอกไฟล์จาก /reports มาไว้ใน workspace เพื่อ archive
-                    cp /reports/trivy-scan-report.html ./
-                 """
                  archiveArtifacts artifacts: 'trivy-scan-report.html', fingerprint: false
 
                   // เพิ่ม publishHTML เพื่อดู report ใน Jenkins UI
