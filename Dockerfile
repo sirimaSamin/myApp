@@ -23,4 +23,4 @@ COPY . /app/
 EXPOSE 80
 
 # คำสั่งในการรัน Flask app
-CMD ["flask", "run", "--host=0.0.0.0",]
+CMD ["flask", "run", "--host=0.0.0.0"]

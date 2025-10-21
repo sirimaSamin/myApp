@@ -44,7 +44,7 @@ pipeline {
                      --severity CRITICAL ${IMAGE_NAME}:${IMAGE_TAG}\\ 
                      --format template \\
                      --template \"@/contrib/html.tpl\" \\
-                     -o /report/trivy-scan-report.html \\ 
+                     -o /reports/trivy-scan-report.html \\ 
                      
                   """
                   // ถ้าเจอ Critical ให้หยุด Pipeline
