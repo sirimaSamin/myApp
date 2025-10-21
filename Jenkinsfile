@@ -41,11 +41,11 @@ pipeline {
                     -v /reports:/report \\
                      aquasec/trivy image \\
                      --no-progress \\
-                     --severity CRITICAL \\ 
+                     --severity CRITICAL ${IMAGE_NAME}:${IMAGE_TAG}\\ 
                      --format template \\
                      --template \"@/contrib/html.tpl\" \\
-                     -o /report/trivy-scan-report.html \\ 
-                     ${IMAGE_NAME}:${IMAGE_TAG}
+                     -o /reports/trivy-scan-report.html \\ 
+                     
                   """
                   // ถ้าเจอ Critical ให้หยุด Pipeline
                   if (trivyExitCode == 1) {
