@@ -57,15 +57,6 @@ pipeline {
              always {
                  archiveArtifacts artifacts: 'trivy-scan-report.html', fingerprint: false
 
-                  // เพิ่ม publishHTML เพื่อดู report ใน Jenkins UI
-                    publishHTML([
-                        allowMissing: false,
-                        alwaysLinkToLastBuild: true,
-                        keepAll: true,
-                        reportDir: '',
-                        reportFiles: 'trivy-scan-report.html',
-                        reportName: 'Trivy Security Report'
-                    ])
                 }
             }
          }    
