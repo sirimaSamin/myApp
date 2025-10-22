@@ -37,7 +37,7 @@ pipeline {
                   sh """
                      docker run --rm \\
                      -v /var/run/docker.sock:/var/run/docker.sock \\
-                     -v $(pwd):/report \\
+                     -v ${WORKSPACE}:/report \\
                      aquasec/trivy image \\
                      --no-progress \\
                      --severity CRITICAL \\ 
