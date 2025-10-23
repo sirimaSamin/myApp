@@ -1,10 +1,20 @@
 pipeline {
     agent any
+    
 
     environment {
         DOCKERHUB_CREDENTIALS = 'docker-hub'
         IMAGE_NAME = 'sirimakg/jenkins-test'
         IMAGE_TAG = 'v2'
+    }
+
+ // ✅ ตั้งค่าลบ build เก่าให้อัตโนมัติ
+    options {
+        buildDiscarder(logRotator(
+            numToKeepStr: '5',
+            artifactNumToKeepStr: '5',
+            daysToKeepStr: '3'
+        ))
     }
 
     stages {
@@ -24,8 +34,8 @@ pipeline {
     }
 }
         stage('Security Scan Trivy') {
-           steps {
-              script {
+             steps {
+               script {
             // สแกนและตรวจสอบ Critical Vulnerabilities
                   def trivyExitCode = sh(
                       script: "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image \
@@ -38,12 +48,13 @@ pipeline {
                      docker run --rm \\
                      -v /var/run/docker.sock:/var/run/docker.sock \\
                      -v ${WORKSPACE}:/report \\
+                     -v ${WORKSPACE}/html.tpl:/html.tpl \\
                      aquasec/trivy image \\
                      --no-progress \\
-                     --severity CRITICAL \\ 
+                     --severity CRITICAL \\
                      --format template \\
-                     --template \"@/contrib/html.tpl\" \\
-                     -o /report/trivy-scan-report.html \\ 
+                     --template "/html.tpl" \\
+                     -o /report/trivy-scan-report.html \\
                      ${IMAGE_NAME}:${IMAGE_TAG}
                   """
                   // ถ้าเจอ Critical ให้หยุด Pipeline
@@ -53,7 +64,7 @@ pipeline {
         }
     }
 
-           post {
+          post {
              always {
                  archiveArtifacts artifacts: 'trivy-scan-report.html', fingerprint: false
 
