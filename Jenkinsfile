@@ -23,6 +23,7 @@ pipeline {
                 git branch: 'Develop', url: 'https://github.com/sirimaSamin/myApp.git'
             }
         }
+    }
 
         stage('Build Docker Image') {
            steps {
@@ -50,22 +51,26 @@ pipeline {
                      -o /report/trivy-scan-report.html \\
                      ${IMAGE_NAME}:${IMAGE_TAG}
                   """
-                  // archive report ทันที
-                  archiveArtifacts artifacts: 'trivy-scan-report.html', fingerprint: false
+              post {
+                    always {
+                       archiveArtifacts artifacts: 'trivy-scan-report.json', fingerprint: false
+                    }
+                  }
+              }
 
                   // สแกนและตรวจสอบ Critical Vulnerabilities
                   def trivyExitCode = sh(
                       script: "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image \
                        --no-progress --exit-code 1 --severity CRITICAL ${IMAGE_NAME}:${IMAGE_TAG}",
                       returnStatus: true
-            ) 
+                     ) 
                   // ถ้าเจอ Critical ให้หยุด Pipeline
                   if (trivyExitCode == 1) {
                       error("พบ CRITICAL! หยุดกระบวนการ")
             }
         }
     }
-}           
+           
             
 
         stage('Push to Docker Hub') {
@@ -90,4 +95,4 @@ pipeline {
             }
         }
     }
-}
+
