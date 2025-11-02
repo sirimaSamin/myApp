@@ -51,7 +51,7 @@ pipeline {
                      ${IMAGE_NAME}:${IMAGE_TAG}
                   """
                   // archive report ทันที
-                  archiveArtifacts artifacts: 'report/trivy-scan-report.html', fingerprint: false
+                  archiveArtifacts artifacts: 'trivy-scan-report.html', fingerprint: false
 
                   // สแกนและตรวจสอบ Critical Vulnerabilities
                   def trivyExitCode = sh(
