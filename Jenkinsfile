@@ -23,7 +23,7 @@ pipeline {
                 git branch: 'Develop', url: 'https://github.com/sirimaSamin/myApp.git'
             }
         }
-    }
+    
 
         stage('Build Docker Image') {
            steps {
