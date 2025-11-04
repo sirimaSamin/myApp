@@ -37,6 +37,18 @@ pipeline {
         stage('Security Scan Trivy') {
             steps {
                script {
+                 // ตรวจสอบว่าไฟล์ template มีอยู่
+                    sh '''
+                    echo "ตรวจสอบไฟล์ html.tpl..."
+                    if [ ! -f "html.tpl" ]; then
+                        echo " ERROR: html.tpl not found!"
+                        echo "ไฟล์ที่อยู่ใน directory:"
+                        ls -la
+                        exit 1
+                    else
+                        echo " พบไฟล์ html.tpl"
+                    fi
+                    '''
             // เซฟรายงานเป็น HTML (จะทำงานเสมอไม่ว่าจะพบ vulnerability หรือไม่)
                   sh """
                      docker run --rm \\
@@ -48,14 +60,14 @@ pipeline {
                      --severity CRITICAL \\
                      --format template \\
                      --template "/html.tpl" \\
-                     -o /reports/trivy-scan-reports.html \\
+                     -o /reports/trivy-scan-report.html \\
                      ${IMAGE_NAME}:${IMAGE_TAG}
                   """
                }
             }
             post {
                     always {
-                       archiveArtifacts artifacts: 'trivy-scan-reports.html', fingerprint: false
+                       archiveArtifacts artifacts: 'trivy-scan-report.html', fingerprint: false
                     }
                   }
               }
