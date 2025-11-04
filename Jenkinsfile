@@ -41,14 +41,14 @@ pipeline {
                   sh """
                      docker run --rm \\
                      -v /var/run/docker.sock:/var/run/docker.sock \\
-                     -v ${WORKSPACE}:/report \\
+                     -v ${WORKSPACE}:/reports \\
                      -v ${WORKSPACE}/html.tpl:/html.tpl \\
                      aquasec/trivy image \\
                      --no-progress \\
                      --severity CRITICAL \\
                      --format template \\
                      --template "/html.tpl" \\
-                     -o /report/trivy-scan-report.html \\
+                     -o /reports/trivy-scan-reports.html \\
                      ${IMAGE_NAME}:${IMAGE_TAG}
                   """
                }
