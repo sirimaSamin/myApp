@@ -55,7 +55,7 @@ pipeline {
             }
             post {
                     always {
-                       archiveArtifacts artifacts: 'trivy-scan-report.html', fingerprint: false
+                       archiveArtifacts artifacts: 'trivy-scan-reports.html', fingerprint: false
                     }
                   }
               }
