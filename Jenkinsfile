@@ -37,31 +37,32 @@ pipeline {
         stage('Security Scan Trivy') {
             steps {
                script {
-                 // ตรวจสอบว่าไฟล์ template มีอยู่
+                // ตรวจสอบว่าไฟล์ template มีอยู่
                     sh '''
-                    echo "ตรวจสอบไฟล์ html.tpl..."
-                    if [ ! -f "html.tpl" ]; then
-                        echo " ERROR: html.tpl not found!"
-                        echo "ไฟล์ที่อยู่ใน directory:"
+                    echo "🔍 ตรวจสอบไฟล์ html.tpl..."
+                    if [ -f "html.tpl" ]; then
+                        echo " พบไฟล์ html.tpl"
+                        echo "ขนาดไฟล์: $(wc -l < html.tpl) บรรทัด"
+                    else
+                        echo "ERROR: ไม่พบไฟล์ html.tpl!"
+                        echo "ไฟล์ใน directory:"
                         ls -la
                         exit 1
-                    else
-                        echo " พบไฟล์ html.tpl"
                     fi
                     '''
             // เซฟรายงานเป็น HTML (จะทำงานเสมอไม่ว่าจะพบ vulnerability หรือไม่)
-                  sh """
-                     docker run --rm \\
-                     -v /var/run/docker.sock:/var/run/docker.sock \\
-                     -v ${WORKSPACE}:/reports \\
-                     -v ${WORKSPACE}/html.tpl:/html.tpl \\
-                     aquasec/trivy image \\
-                     --no-progress \\
-                     --severity CRITICAL \\
-                     --format template \\
-                     --template "/html.tpl" \\
-                     -o /reports/trivy-scan-report.html \\
-                     ${IMAGE_NAME}:${IMAGE_TAG}
+                   sh """
+                      docker run --rm \\
+                      -v /var/run/docker.sock:/var/run/docker.sock \\
+                      -v \$(pwd):/workspace \\
+                      -w /workspace \\
+                      aquasec/trivy image \\
+                      --no-progress \\
+                      --severity CRITICAL \\
+                      --format template \\
+                      --template "@html.tpl" \\
+                      -o trivy-scan-report.html \\
+                      ${IMAGE_NAME}:${IMAGE_TAG}
                   """
                }
             }
@@ -72,7 +73,7 @@ pipeline {
                   }
               }
 
-        stage('Check Critical ') {
+        stage('Check Critical') {
             steps {
                 script {
                     // สแกนและตรวจสอบ Critical Vulnerabilities
