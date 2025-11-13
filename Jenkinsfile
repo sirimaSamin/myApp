@@ -34,44 +34,30 @@ pipeline {
         }
     }
 }
-        stage('Security Scan Trivy') {
+       stage('Security Scan Trivy') {
             steps {
-               script {
-                // ตรวจสอบว่าไฟล์ template มีอยู่
-                    sh '''
-                    echo "🔍 ตรวจสอบไฟล์ html.tpl..."
-                    if [ -f "html.tpl" ]; then
-                        echo " พบไฟล์ html.tpl"
-                        echo "ขนาดไฟล์: $(wc -l < html.tpl) บรรทัด"
-                    else
-                        echo "ERROR: ไม่พบไฟล์ html.tpl!"
-                        echo "ไฟล์ใน directory:"
-                        ls -la
-                        exit 1
-                    fi
-                    '''
-            // เซฟรายงานเป็น HTML (จะทำงานเสมอไม่ว่าจะพบ vulnerability หรือไม่)
-                   sh """
-                      docker run --rm \\
+                script {
+                    // สแกนและสร้างรายงาน HTML
+                    sh """
+                    docker run --rm \\
                       -v /var/run/docker.sock:/var/run/docker.sock \\
                       -v \$(pwd):/workspace \\
                       -w /workspace \\
                       aquasec/trivy image \\
                       --no-progress \\
                       --severity CRITICAL \\
-                      --format template \\
-                      --template "@contrib/html.tpl" \\
+                      --format html \\
                       -o trivy-scan-report.html \\
                       ${IMAGE_NAME}:${IMAGE_TAG}
-                  """
-               }
+                    """
+                }
             }
             post {
-                    always {
-                       archiveArtifacts artifacts: 'trivy-scan-report.html', fingerprint: false
-                    }
-                  }
-              }
+                always {
+                    archiveArtifacts artifacts: 'trivy-scan-report.html', fingerprint: false
+                }
+            }
+        }
 
         stage('Check Critical') {
             steps {
@@ -85,11 +71,20 @@ pipeline {
                     // ถ้าเจอ Critical ให้หยุด Pipeline
                     if (trivyExitCode == 1) {
                         error("พบ CRITICAL! หยุดกระบวนการ")
+
+                     // แสดงสรุปผลการสแกน
+                    echo "📊 สรุปผลการ Security Scan"
+                    if (fileExists('trivy-scan-report.html')) {
+                        echo " สร้างรายงานการสแกนเรียบร้อยแล้ว"
+                        echo " รายงานถูกเก็บไว้ที่: trivy-scan-report.html"
+                    } else {
+                        echo " ไม่พบไฟล์รายงาน"                              
+        
                     }
                 }
             }
         }
-           
+    }     
             
 
         stage('Push to Docker Hub') {
