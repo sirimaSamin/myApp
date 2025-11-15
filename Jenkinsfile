@@ -47,8 +47,8 @@ pipeline {
                       --no-progress \\
                       --severity CRITICAL \\
                       --format template \\
-                      --template /mnt/d/myApp/html.tpl \\
-                      -o /mnt/d/myApp/trivy-scan-report.html \\
+                      --template "@html.tpl" \\
+                      -o trivy-scan-report.html \\
                       ${IMAGE_NAME}:${IMAGE_TAG}
                     """
                 }
