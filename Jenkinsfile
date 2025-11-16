@@ -37,6 +37,11 @@ pipeline {
        stage('Security Scan Trivy') {
             steps {
                 script {
+                     // ตรวจสอบว่ามีไฟล์ html.tpl ใน repository
+                       sh """
+                          echo "=== Checking for html.tpl file ==="
+                          ls -la *.tpl || echo "No template files found"
+                          """
                     // สแกนและสร้างรายงาน HTML
                     sh """
                     docker run --rm \\
@@ -46,7 +51,8 @@ pipeline {
                       aquasec/trivy:latest image \\
                       --no-progress \\
                       --severity CRITICAL \\
-                      --format html \\                     
+                      --format html \\
+                      --template @html.tpl \\                     
                       -o trivy-scan-report.html \\
                       ${IMAGE_NAME}:${IMAGE_TAG}
                     """
