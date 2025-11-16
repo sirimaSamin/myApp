@@ -43,11 +43,10 @@ pipeline {
                       -v /var/run/docker.sock:/var/run/docker.sock \\
                       -v ${WORKSPACE}:/workspace \\
                       -w /workspace \\
-                      aquasec/trivy image \\
+                      aquasec/trivy:latest image \\
                       --no-progress \\
                       --severity CRITICAL \\
-                      --format template \\
-                      --template "@/usr/local/share/trivy/templates/html.tpl" \\
+                      --format html \\                     
                       -o trivy-scan-report.html \\
                       ${IMAGE_NAME}:${IMAGE_TAG}
                     """
@@ -65,7 +64,7 @@ pipeline {
                 script {
                     // สแกนและตรวจสอบ Critical Vulnerabilities
                     def trivyExitCode = sh(
-                        script: "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy image --no-progress --exit-code 1 --severity CRITICAL ${IMAGE_NAME}:${IMAGE_TAG}",
+                        script: "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --no-progress --exit-code 1 --severity CRITICAL ${IMAGE_NAME}:${IMAGE_TAG}",
                         returnStatus: true
                     ) 
                     
