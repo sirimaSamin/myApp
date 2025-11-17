@@ -52,15 +52,15 @@ pipeline {
                       --no-progress \\
                       --severity CRITICAL \\
                       --format template \\
-                      --template "@html.tpl" \\                     
-                      -o trivy-scan-report.html \\
+                      --template "@crotrib/html.tpl" \\                     
+                      -o scan-report.html \\
                       ${IMAGE_NAME}:${IMAGE_TAG}
                     """
                 }
             }
             post {
                 always {
-                    archiveArtifacts artifacts: 'trivy-scan-report.html', fingerprint: false
+                    archiveArtifacts artifacts: 'scan-report.html', fingerprint: false
                 }
             }
         }
@@ -80,9 +80,9 @@ pipeline {
 
                      // แสดงสรุปผลการสแกน
                     echo "📊 สรุปผลการ Security Scan"
-                    if (fileExists('trivy-scan-report.html')) {
+                    if (fileExists('scan-report.html')) {
                         echo " สร้างรายงานการสแกนเรียบร้อยแล้ว"
-                        echo " รายงานถูกเก็บไว้ที่: trivy-scan-report.html"
+                        echo " รายงานถูกเก็บไว้ที่: scan-report.html"
                     } else {
                         echo " ไม่พบไฟล์รายงาน"                              
         
