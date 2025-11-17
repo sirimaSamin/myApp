@@ -51,7 +51,7 @@ pipeline {
                       aquasec/trivy:latest image \\
                       --no-progress \\
                       --severity CRITICAL \\
-                      --format html \\
+                      --format template \\
                       --template @html.tpl \\                     
                       -o trivy-scan-report.html \\
                       ${IMAGE_NAME}:${IMAGE_TAG}
