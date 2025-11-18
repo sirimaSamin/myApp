@@ -36,12 +36,9 @@ pipeline {
 }
        stage('Security Scan Trivy') {
             steps {
-                script {
-                     // ตรวจสอบว่ามีไฟล์ html.tpl ใน repository
-                       sh """
-                          echo "=== Checking for html.tpl file ==="
-                          ls -la *.tpl || echo "No template files found"
-                          """
+                script { 
+                    // DEBUG: แสดงค่าของตัวแปรก่อนรัน
+                    sh "echo 'Scanning Image: ${IMAGE_NAME}:${IMAGE_TAG}'"                    
                     // สแกนและสร้างรายงาน HTML
                     sh """
                     docker run --rm \\
