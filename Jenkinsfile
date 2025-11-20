@@ -42,7 +42,7 @@ pipeline {
                     // สแกนและสร้างรายงาน HTML
                     sh """
                     docker run --rm \\
-                    -v /var/run/docker.sock:/var/run/docker.sock -v \$(pwd):/workspace -w /workspace aquasec/trivy:latest image --no-progress --severity CRITICAL --format template --template "@html.tpl" -o /reports/scan-report.html ${IMAGE_NAME}:${IMAGE_TAG}
+                    -v /var/run/docker.sock:/var/run/docker.sock -v \$(pwd):/workspace -w /workspace aquasec/trivy:latest image --no-progress --severity CRITICAL --format template --template "@html.tpl" -o scan-report.html ${IMAGE_NAME}:${IMAGE_TAG}
                     """
                 }
             }
