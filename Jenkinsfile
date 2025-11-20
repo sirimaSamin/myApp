@@ -50,8 +50,7 @@ pipeline {
                       --severity CRITICAL \\
                       --format template \\
                       --template "@crotrib/html.tpl" \\                     
-                      -o scan-report.html \\
-                      ${IMAGE_NAME}:${IMAGE_TAG}
+                      -o scan-report.html ${IMAGE_NAME}:${IMAGE_TAG}
                     """
                 }
             }
