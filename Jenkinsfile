@@ -6,7 +6,10 @@ pipeline {
         DOCKERHUB_CREDENTIALS = 'docker-hub'
         IMAGE_NAME = 'sirimakg/jenkins-test'
         IMAGE_TAG = 'v2'
+        // กำหนด URL ของ Trivy HTML Template เพื่อให้อ่านง่าย
+        TRIVY_TPL_URL = 'https://raw.githubusercontent.com/aquasec/trivy/main/contrib/html.tpl'
     }
+    
 
  // ✅ ตั้งค่าลบ build เก่าให้อัตโนมัติ
     options {
@@ -23,7 +26,17 @@ pipeline {
                 git branch: 'Develop', url: 'https://github.com/sirimaSamin/myApp.git'
             }
         }
-    
+
+        stage('Download trivy html template'){
+            steps{
+                script{
+                    // ใช้ wget เพื่อดาวน์โหลดไฟล์และบันทึกใน Workspace ด้วยชื่อ html.tpl                   
+                    echo"Download HTML template from $TRIVY_TPL_URL"
+                    // ไฟล์นี้จะถูกมองเห็นโดย Trivy ใน /workspace
+                    sh"wget -q $TRIVY_TPL_URL -o html.tpl"
+                }
+            }
+       }
 
         stage('Build Docker Image') {
            steps {
@@ -34,11 +47,11 @@ pipeline {
         }
     }
 }
+       
+
        stage('Security Scan Trivy') {
             steps {
-                script { 
-                    // DEBUG: แสดงค่าของตัวแปรก่อนรัน
-                    sh "echo 'Scanning Image: ${IMAGE_NAME}:${IMAGE_TAG}'"                    
+                script {                   
                     // สแกนและสร้างรายงาน HTML
                     sh """
                     docker run --rm \\
@@ -67,11 +80,11 @@ pipeline {
                         error("พบ CRITICAL! หยุดกระบวนการ")
 
                      // แสดงสรุปผลการสแกน
-                    echo "📊 สรุปผลการ Security Scan"
+                    echo " สรุปผลการ Security Scan"
                     if (fileExists('scan-report.html')) {
                         echo " สร้างรายงานการสแกนเรียบร้อยแล้ว"
-                        echo " รายงานถูกเก็บไว้ที่: scan-report.html"
-                    } else {
+                    } 
+                    else {
                         echo " ไม่พบไฟล์รายงาน"                              
         
                     }
