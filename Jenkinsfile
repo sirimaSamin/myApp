@@ -44,12 +44,14 @@ pipeline {
                     // สแกนและสร้างรายงาน HTML
                     sh """
                     docker run --rm \\
-                    -v /var/run/docker.sock:/var/run/docker.sock --entrypoint sh -c "wget -qO html.tpl https://raw.githubusercontent.com/aquasec/trivy/main/contrib/html.tpl && trivy image image --no-progress --severity CRITICAL --format template --template @html.tpl ${IMAGE_NAME}:${IMAGE_TAG}" > scan-report.html
+                    -v /var/run/docker.sock:/var/run/docker.sock \\
+                    --entrypoint sh aquasec/trivy:latest \\
+                    -c "wget -qO html.tpl ${TRIVY_TPL_URL} && trivy image --no-progress --severity CRITICAL --format template --template @html.tpl ${IMAGE_NAME}:${IMAGE_TAG}" > scan-report.html
                     """
                 }
             }
             post {
-                always {
+                always {// Archive ไฟล์ไว้ดูเสมอ ไม่ว่าจะผ่านหรือพัง
                     archiveArtifacts artifacts: 'scan-report.html', fingerprint: false
                 }
             }
@@ -63,10 +65,6 @@ pipeline {
                         script: "docker run --rm -v /var/run/docker.sock:/var/run/docker.sock aquasec/trivy:latest image --no-progress --exit-code 1 --severity CRITICAL ${IMAGE_NAME}:${IMAGE_TAG}",
                         returnStatus: true
                     ) 
-                    
-                    // ถ้าเจอ Critical ให้หยุด Pipeline
-                    if (trivyExitCode == 1) {
-                        error("พบ CRITICAL! หยุดกระบวนการ")
 
                      // แสดงสรุปผลการสแกน
                     echo " สรุปผลการ Security Scan"
@@ -77,6 +75,9 @@ pipeline {
                         echo " ไม่พบไฟล์รายงาน"                              
         
                     }
+                    // ถ้าเจอ Critical ให้หยุด Pipeline
+                    if (trivyExitCode == 1) {
+                        error("พบ CRITICAL! หยุดกระบวนการ")
                 }
             }
         }
