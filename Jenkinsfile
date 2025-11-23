@@ -27,17 +27,6 @@ pipeline {
             }
         }
 
-        stage('Download trivy html template'){
-            steps{
-                script{
-                    // ใช้ wget เพื่อดาวน์โหลดไฟล์และบันทึกใน Workspace ด้วยชื่อ html.tpl                   
-                    echo"Download HTML template from $TRIVY_TPL_URL"
-                    // ไฟล์นี้จะถูกมองเห็นโดย Trivy ใน /workspace
-                    sh"curl -sS -L $TRIVY_TPL_URL -o html.tpl"
-                }
-            }
-       }
-
         stage('Build Docker Image') {
            steps {
               script {
@@ -55,7 +44,7 @@ pipeline {
                     // สแกนและสร้างรายงาน HTML
                     sh """
                     docker run --rm \\
-                    -v /var/run/docker.sock:/var/run/docker.sock -v \$(pwd):/workspace -w /workspace aquasec/trivy:latest image --no-progress --severity CRITICAL --format template --template "@html.tpl" -o scan-report.html ${IMAGE_NAME}:${IMAGE_TAG}
+                    -v /var/run/docker.sock:/var/run/docker.sock --entrypoint sh -c "wget -qO html.tpl https://raw.githubusercontent.com/aquasec/trivy/main/contrib/html.tpl && trivy image image --no-progress --severity CRITICAL --format template --template @html.tpl ${IMAGE_NAME}:${IMAGE_TAG}" > scan-report.html
                     """
                 }
             }
