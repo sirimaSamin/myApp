@@ -33,7 +33,7 @@ pipeline {
                     // ใช้ wget เพื่อดาวน์โหลดไฟล์และบันทึกใน Workspace ด้วยชื่อ html.tpl                   
                     echo"Download HTML template from $TRIVY_TPL_URL"
                     // ไฟล์นี้จะถูกมองเห็นโดย Trivy ใน /workspace
-                    sh"wget -q $TRIVY_TPL_URL -o html.tpl"
+                    sh"curl -sS -L $TRIVY_TPL_URL -o html.tpl"
                 }
             }
        }
