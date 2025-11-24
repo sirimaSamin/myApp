@@ -7,7 +7,7 @@ pipeline {
         IMAGE_NAME = 'sirimakg/jenkins-test'
         IMAGE_TAG = 'v2'
         // กำหนด URL ของ Trivy HTML Template เพื่อให้อ่านง่าย
-        TRIVY_TPL_URL = 'https://raw.githubusercontent.com/aquasec/trivy/main/contrib/html.tpl'
+        TRIVY_TPL_URL = 'https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/html.tpl'
     }
     
 
